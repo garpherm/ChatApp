@@ -37,12 +37,7 @@ jobs:
       # 👉 Build Backend (nếu có build script)
       - name: Build Backend
         working-directory: /home/ubuntu/www/ChatApp/backend
-        run: |
-          if [ -f package.json ] && grep -q '"build"' package.json; then
-            pnpm run build
-          else
-            echo "No backend build script"
-          fi
+        run: pnpm run build
 
       # 👉 Reload PM2
       - name: Reload PM2
