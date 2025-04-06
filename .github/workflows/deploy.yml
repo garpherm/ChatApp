@@ -11,10 +11,7 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Install pnpm globally
-        run: npm install -g pnpm
-
-      # 👉 Pull latest code
+      # 👉 Pull latest code from GitHub
       - name: Pull latest code from GitHub
         working-directory: /home/ubuntu/www/ChatApp
         run: |
