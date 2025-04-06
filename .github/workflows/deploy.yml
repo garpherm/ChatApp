@@ -1,0 +1,54 @@
+name: Deploy on EC2 self-hosted runner
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Install pnpm globally
+        run: npm install -g pnpm
+
+      # 👉 Pull latest code
+      - name: Pull latest code from GitHub
+        working-directory: /home/ubuntu/www/ChatApp
+        run: |
+          git reset --hard
+          git clean -fd
+          git pull origin main
+
+      # 👉 Install Frontend Dependencies
+      - name: Install Frontend Dependencies
+        working-directory: /home/ubuntu/www/ChatApp/frontend
+        run: pnpm install
+
+      # 👉 Build Frontend
+      - name: Build Frontend
+        working-directory: /home/ubuntu/www/ChatApp/frontend
+        run: pnpm run build
+
+      # 👉 Install Backend Dependencies
+      - name: Install Backend Dependencies
+        working-directory: /home/ubuntu/www/ChatApp/backend
+        run: pnpm install
+
+      # 👉 Build Backend (nếu có build script)
+      - name: Build Backend
+        working-directory: /home/ubuntu/www/ChatApp/backend
+        run: |
+          if [ -f package.json ] && grep -q '"build"' package.json; then
+            pnpm run build
+          else
+            echo "No backend build script"
+          fi
+
+      # 👉 Reload PM2
+      - name: Reload PM2
+        run: |
+          pm2 reload frontend
+          pm2 reload backend
