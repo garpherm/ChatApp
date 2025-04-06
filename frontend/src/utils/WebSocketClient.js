@@ -26,7 +26,7 @@ class WebSocketClient {
 }
 
 const token = cookies.get('token');
-const instance = new WebSocketClient("http://localhost:3000", token);
+const instance = new WebSocketClient("http://13.229.127.229:3000", token);
 Object.freeze(instance);
 
 export default instance;
