@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import AuthPage from './pages/Auth'
 import ChatPage from './pages/Chat'
@@ -10,6 +10,10 @@ import { useSelector } from 'react-redux'
 function App() {
 
   const { loggedIn } = useSelector((state) => state.authReducer)
+
+    useEffect(() => {
+      document.title = "Chat App";
+    }, []);
 
   return (
     <BrowserRouter>
