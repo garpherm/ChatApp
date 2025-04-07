@@ -12,7 +12,7 @@ function App() {
   const { loggedIn } = useSelector((state) => state.authReducer)
 
     useEffect(() => {
-      document.title = "Chat App";
+      document.title = "Chat Application";
     }, []);
 
   return (
