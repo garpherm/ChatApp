@@ -1,77 +1,84 @@
-import { useState, useCallback, useEffect } from 'react'
-import useFetch from '../../hooks/useFetch'
-import { useSelector, useDispatch } from 'react-redux'
-import { debounce } from 'lodash'
-import { conversationActions } from '../../store/conversationSlice'
+import { useState, useCallback, useEffect } from "react";
+import useFetch from "../../hooks/useFetch";
+import { useSelector, useDispatch } from "react-redux";
+import { debounce } from "lodash";
+import { conversationActions } from "../../store/conversationSlice";
 
 export default function CreateChatModal() {
-  const { user } = useSelector((state) => state.userReducer)
-  const { conversations } = useSelector((state) => state.conversationReducer)
-  const dispatch = useDispatch()
-  const [selectedUsers, setSelectedUsers] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [groupName, setGroupName] = useState('')
+  const { user } = useSelector((state) => state.userReducer);
+  const { conversations } = useSelector((state) => state.conversationReducer);
+  const dispatch = useDispatch();
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [groupName, setGroupName] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const { reqFunc: searchUser, reqState } = useFetch({ method: "GET", url: `${import.meta.env.VITE_URL}/users` }, (data) => {
-    setSearchResults(data.filter(
-      u => u.id !== user.id &&
-        !selectedUsers.some(su => su.id === u.id)
-    ))
-  },
+  const { reqFunc: searchUser, reqState } = useFetch(
+    { method: "GET", url: `${import.meta.env.VITE_URL}/users` },
+    (data) => {
+      setSearchResults(
+        data.filter(
+          (u) => u.id !== user.id && !selectedUsers.some((su) => su.id === u.id)
+        )
+      );
+    },
     (err) => {
-      console.error(err)
+      console.error(err);
     }
-  )
+  );
 
-  const { reqFunc: createConversation } = useFetch({ method: "POST", url: `${import.meta.env.VITE_URL}/conversations` }, (data) => {
-    dispatch(conversationActions.addToConversations(data))
-    console.log(data)
-  },
+  const { reqFunc: createConversation } = useFetch(
+    { method: "POST", url: `${import.meta.env.VITE_URL}/conversations` },
+    (data) => {
+      dispatch(conversationActions.addToConversations(data));
+      console.log(data);
+    },
     (err) => {
-      console.error(err)
-    })
+      console.error(err);
+    }
+  );
 
   const debouncedSearch = useCallback(
-    debounce(async (term) => await searchUser('', `?search=${term}`), 300),
+    debounce(async (term) => await searchUser("", `?search=${term}`), 300),
     []
   );
 
   useEffect(() => {
     if (!searchTerm) {
-      setSearchResults([])
-      setShowDropdown(false)
-      return
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
     }
 
-    setShowDropdown(true)
-    debouncedSearch(searchTerm)
-
-  }, [searchTerm])
+    setShowDropdown(true);
+    debouncedSearch(searchTerm);
+  }, [searchTerm]);
 
   const handleCreateChat = async () => {
-    setSelectedUsers([])
-    setGroupName('')
-    setSearchTerm('')
-    if (selectedUsers.length == 0)
-      return
+    setSelectedUsers([]);
+    setGroupName("");
+    setSearchTerm("");
+    if (selectedUsers.length == 0) return;
 
     if (selectedUsers.length == 1) {
       const existingConversation = conversations.find(
-        c => c.Participants.length === 2 &&
-          c.Participants.some(p => p["Users"].id === selectedUsers[0].id)
-      )
+        (c) =>
+          c.Participants.length === 2 &&
+          c.Participants.some((p) => p["Users"].id === selectedUsers[0].id)
+      );
       if (existingConversation) {
-        dispatch(conversationActions.setCurrentConversation(existingConversation))
-        return
+        dispatch(
+          conversationActions.setCurrentConversation(existingConversation)
+        );
+        return;
       }
     }
     createConversation({
       name: groupName,
-      participantIds: [...selectedUsers.map(u => u.id)]
-    })
-  }
+      participantIds: [...selectedUsers.map((u) => u.id)],
+    });
+  };
 
   return (
     <>
@@ -89,24 +96,25 @@ export default function CreateChatModal() {
                 className="input input-bordered w-full"
                 value={searchTerm}
                 onChange={(e) => {
-                  setSearchTerm(e.target.value)
+                  setSearchTerm(e.target.value);
                 }}
               />
 
               {/* Dropdown */}
               {showDropdown && searchResults.length > 0 && (
                 <div className="absolute z-20 w-full mt-1 bg-white border rounded-md shadow-lg max-h-[200px] overflow-y-auto">
-                  {searchResults.map(user => (
+                  {searchResults.map((user) => (
                     <div
                       key={user.id}
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
-                        setSelectedUsers(prev => [...prev, user])
-                        setSearchTerm('')
-                        setShowDropdown(false)
+                        setSelectedUsers((prev) => [...prev, user]);
+                        setSearchTerm("");
+                        setShowDropdown(false);
                       }}
                     >
                       {user.username}
+                      <br />
                       {user.email}
                     </div>
                   ))}
@@ -116,12 +124,18 @@ export default function CreateChatModal() {
 
             {/* User List */}
             <div className="mt-2">
-              {selectedUsers.map(user => (
+              {selectedUsers.map((user) => (
                 <div key={user.id} className="badge badge-primary gap-2 m-1">
                   {user.username}
-                  <button onClick={() => setSelectedUsers(prev =>
-                    prev.filter(u => u.id !== user.id)
-                  )}>×</button>
+                  <button
+                    onClick={() =>
+                      setSelectedUsers((prev) =>
+                        prev.filter((u) => u.id !== user.id)
+                      )
+                    }
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
@@ -142,12 +156,13 @@ export default function CreateChatModal() {
 
           <div className="modal-action">
             <form method="dialog">
-              <button className="btn btn-error mr-2"
+              <button
+                className="btn btn-error mr-2"
                 onClick={() => {
-                  document.getElementById('create_chat_modal').close()
-                  setSelectedUsers([])
-                  setGroupName('')
-                  setSearchTerm('')
+                  document.getElementById("create_chat_modal").close();
+                  setSelectedUsers([]);
+                  setGroupName("");
+                  setSearchTerm("");
                 }}
               >
                 Cancel
@@ -156,8 +171,8 @@ export default function CreateChatModal() {
                 className="btn btn-primary"
                 onClick={() => {
                   // Handle chat creation logic here
-                  handleCreateChat()
-                  document.getElementById('create_chat_modal').close()
+                  handleCreateChat();
+                  document.getElementById("create_chat_modal").close();
                 }}
               >
                 Create
@@ -167,5 +182,5 @@ export default function CreateChatModal() {
         </div>
       </dialog>
     </>
-  )
+  );
 }
