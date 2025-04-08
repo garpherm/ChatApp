@@ -22,11 +22,6 @@ jobs:
         working-directory: /home/ubuntu/www/ChatApp/frontend
         run: pnpm install
 
-      # 👉 Build Frontend
-      - name: Build Frontend
-        working-directory: /home/ubuntu/www/ChatApp/frontend
-        run: pnpm run build
-
       # 👉 Install Backend Dependencies
       - name: Install Backend Dependencies
         working-directory: /home/ubuntu/www/ChatApp/backend
@@ -34,7 +29,7 @@ jobs:
 
       # 👉 Build Backend (nếu có build script)
       - name: Build Backend
-        working-directory: /home/ubuntu/www/ChatApp/backend
+        working-directory: /home/ubuntu/www/ChatApp
         run: pnpm run build
 
       # 👉 Reload PM2
