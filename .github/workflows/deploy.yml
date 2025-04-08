@@ -28,7 +28,7 @@ jobs:
         run: pnpm install
 
       # 👉 Build Backend (nếu có build script)
-      - name: Build Backend
+      - name: Build 
         working-directory: /home/ubuntu/www/ChatApp
         run: pnpm run build
 
